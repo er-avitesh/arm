@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SolarEPC Dashboard — Role Preview (Demo Data)</title>
+<style>
+:root{
+  color-scheme: light;
+  --page:#f9f9f7; --surface:#fcfcfb; --surface-2:#ffffff;
+  --ink:#0b0b0b; --ink-2:#52514e; --ink-muted:#898781;
+  --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,0.10);
+  --brand:#0e7490; --brand-dark:#0b5b73; --brand-light:#ecfeff; --brand-ring:#a5f3fc;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
+  --seq-250:#86b6ef; --seq-350:#5598e7; --seq-450:#2a78d6; --seq-550:#1c5cab;
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --success-text:#006300;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19; --surface-2:#212120;
+    --ink:#ffffff; --ink-2:#c3c2b7; --ink-muted:#898781;
+    --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+    --brand:#22a5c2; --brand-dark:#1c8aa3; --brand-light:#0f2a30; --brand-ring:#1c4a54;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+    --seq-250:#5598e7; --seq-350:#2a78d6; --seq-450:#1c5cab; --seq-550:#104281;
+    --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#e66767;
+    --success-text:#0ca30c;
+  }
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1320px;margin:0 auto;padding:0 20px 60px;}
+
+/* ---------- top chrome ---------- */
+.topbar{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;}
+.topbar-inner{max-width:1320px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;}
+.brand .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand-dark));display:flex;align-items:center;justify-content:center;font-size:15px;}
+.role-switch{display:flex;gap:6px;flex-wrap:wrap;}
+.role-btn{border:1.5px solid var(--border);background:var(--surface-2);color:var(--ink-2);padding:8px 14px;border-radius:9px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;transition:.15s;display:flex;align-items:center;gap:6px;}
+.role-btn:hover{background:var(--brand-light);}
+.role-btn.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+
+.role-caption{max-width:1320px;margin:14px auto 0;padding:0 20px;}
+.caption-card{background:var(--brand-light);border:1px solid var(--brand-ring);border-radius:12px;padding:12px 16px;font-size:12.5px;color:var(--ink-2);line-height:1.6;}
+.caption-card b{color:var(--ink);}
+
+.dash{display:none;padding-top:22px;}
+.dash.active{display:block;}
+
+.dash-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
+.dash-head h1{font-size:23px;font-weight:800;margin:0 0 4px;}
+.dash-head .sub{color:var(--ink-2);font-size:13px;}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-btn{border:1.5px solid var(--border);background:var(--surface-2);color:var(--ink-2);padding:7px 12px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+.filter-btn.active{background:var(--ink);color:var(--surface);border-color:var(--ink);}
+
+/* ---------- grid & cards ---------- */
+.grid{display:grid;gap:14px;}
+.g-kpis{grid-template-columns:repeat(4,1fr);}
+.g-2{grid-template-columns:2fr 1fr;}
+.g-2r{grid-template-columns:1fr 1fr;}
+.g-3{grid-template-columns:repeat(3,1fr);}
+@media(max-width:980px){.g-kpis{grid-template-columns:repeat(2,1fr);}.g-2,.g-2r,.g-3{grid-template-columns:1fr;}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.card h3{font-size:13.5px;font-weight:800;margin:0 0 3px;display:flex;align-items:center;gap:7px;}
+.card .card-sub{font-size:11.5px;color:var(--ink-muted);margin-bottom:14px;}
+
+/* ---------- stat tile ---------- */
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;}
+.stat .icon{position:absolute;top:14px;right:16px;font-size:20px;opacity:.5;}
+.stat .label{font-size:11.5px;color:var(--ink-2);font-weight:700;margin-bottom:6px;}
+.stat .value{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+.stat .delta{font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:4px;}
+.stat .delta.up{color:var(--success-text);}
+.stat .delta.down{color:var(--critical);}
+.stat svg.spark{display:block;margin-top:8px;}
+
+/* ---------- legend / tooltip ---------- */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--ink-2);}
+.legend-item{display:flex;align-items:center;gap:6px;}
+.legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.legend-line{width:14px;height:2px;border-radius:2px;flex-shrink:0;}
+.viz-tooltip{position:absolute;pointer-events:none;background:var(--ink);color:var(--surface);border-radius:9px;padding:9px 12px;font-size:11.5px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .1s;z-index:30;min-width:120px;}
+.viz-tooltip .tt-title{font-weight:700;margin-bottom:5px;color:var(--surface);opacity:.75;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;}
+.viz-tooltip .tt-row{display:flex;align-items:center;gap:7px;justify-content:space-between;}
+.viz-tooltip .tt-key{display:flex;align-items:center;gap:6px;color:var(--surface);opacity:.85;}
+.viz-tooltip .tt-swatch{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.viz-tooltip .tt-val{font-weight:800;}
+.chart-box{position:relative;}
+
+/* ---------- lists ---------- */
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--grid);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{width:22px;height:22px;border-radius:7px;background:var(--brand-light);color:var(--brand);font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lb-name{font-weight:700;font-size:13px;flex:1;min-width:0;}
+.lb-sub{font-size:11px;color:var(--ink-muted);}
+.lb-val{font-weight:800;font-size:13px;white-space:nowrap;}
+
+.alert-row{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;margin-bottom:7px;font-size:12.5px;}
+.alert-row .a-icon{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;}
+.alert-row.crit{background:color-mix(in srgb, var(--critical) 10%, var(--surface));}
+.alert-row.crit .a-icon{background:color-mix(in srgb, var(--critical) 20%, var(--surface));color:var(--critical);}
+.alert-row.warn{background:color-mix(in srgb, var(--warning) 12%, var(--surface));}
+.alert-row.warn .a-icon{background:color-mix(in srgb, var(--warning) 25%, var(--surface));color:#8a5c00;}
+.alert-row .a-text b{display:block;color:var(--ink);}
+.alert-row .a-text span{color:var(--ink-2);font-size:11px;}
+
+.task-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--grid);font-size:12.5px;}
+.task-row:last-child{border-bottom:none;}
+.chk{width:18px;height:18px;border-radius:6px;border:2px solid var(--baseline);flex-shrink:0;}
+.chk.done{background:var(--good);border-color:var(--good);}
+.tag{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px;}
+.tag.high{background:color-mix(in srgb, var(--critical) 15%, var(--surface));color:var(--critical);}
+.tag.med{background:color-mix(in srgb, var(--warning) 20%, var(--surface));color:#8a5c00;}
+.tag.low{background:color-mix(in srgb, var(--s1) 15%, var(--surface));color:var(--s1);}
+
+.meter-row{margin-bottom:14px;}
+.meter-row:last-child{margin-bottom:0;}
+.meter-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;}
+.meter-top .mname{font-weight:700;}
+.meter-track{height:8px;border-radius:5px;background:var(--brand-light);overflow:hidden;}
+.meter-fill{height:100%;border-radius:5px;background:var(--brand);}
+
+table.simple{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.simple th{text-align:left;color:var(--ink-muted);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:0 10px 10px 0;border-bottom:1px solid var(--grid);}
+table.simple td{padding:10px 10px 10px 0;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums;}
+table.simple tr:last-child td{border-bottom:none;}
+.status-pill{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:5px;}
+.status-pill .dot{width:6px;height:6px;border-radius:50%;}
+.status-pill.good{background:color-mix(in srgb, var(--good) 14%, var(--surface));color:var(--success-text);}
+.status-pill.warn{background:color-mix(in srgb, var(--warning) 20%, var(--surface));color:#8a5c00;}
+.status-pill.crit{background:color-mix(in srgb, var(--critical) 15%, var(--surface));color:var(--critical);}
+.status-pill.neutral{background:color-mix(in srgb, var(--s1) 14%, var(--surface));color:var(--s1);}
+
+.footnote{font-size:11px;color:var(--ink-muted);margin-top:8px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="logo">☀️</span> SolarEPC — Dashboard Preview <span style="font-weight:600;color:var(--ink-muted);font-size:12px;">(demo data)</span></div>
+    <div class="role-switch" id="roleSwitch"></div>
+  </div>
+</div>
+<div class="role-caption"><div class="caption-card" id="roleCaption"></div></div>
+
+<div class="wrap" id="dashHost"></div>
+
+<script>
+/* =========================================================================
+   SHARED CHART ENGINE — vanilla SVG, no external libraries
+   ========================================================================= */
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n;}
+function div(cls){const d=document.createElement("div");if(cls)d.className=cls;return d;}
+function fmtINR(n){const a=Math.abs(n);const sign=n<0?"-":"";
+  if(a>=10000000)return sign+"₹"+(a/10000000).toFixed(2)+" Cr";
+  if(a>=100000)return sign+"₹"+(a/100000).toFixed(2)+" L";
+  if(a>=1000)return sign+"₹"+(a/1000).toFixed(1)+"K";
+  return sign+"₹"+Math.round(a);}
+function fmtNum(n){return Math.round(n).toLocaleString("en-IN");}
+function niceMax(v){if(v<=0)return 10;const p=Math.pow(10,Math.floor(Math.log10(v)));const n=v/p;let m;if(n<=1)m=1;else if(n<=2)m=2;else if(n<=5)m=5;else m=10;return m*p;}
+
+function makeTooltip(container){const tt=div("viz-tooltip");container.style.position="relative";container.appendChild(tt);return tt;}
+function showTip(tt,x,y,html){tt.innerHTML=html;tt.style.opacity="1";const cw=tt.parentElement.clientWidth;let left=x+14;if(left+tt.offsetWidth>cw)left=x-tt.offsetWidth-14;tt.style.left=left+"px";tt.style.top=Math.max(4,y-tt.offsetHeight-10)+"px";}
+function hideTip(tt){tt.style.opacity="0";}
+
+/* ---- Line / area chart, multi-series, crosshair tooltip ---- */
+function renderLineChart(host,{labels,series,height=220,formatY=fmtINR,area=false}){
+  const box=div("chart-box");host.appendChild(box);
+  const W=800,H=height,padL=44,padR=14,padT=14,padB=28;
+  const plotW=W-padL-padR,plotH=H-padT-padB;
+  const allVals=series.flatMap(s=>s.values);
+  const maxV=niceMax(Math.max(...allVals,1));
+  const minV=Math.min(0,Math.min(...allVals));
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,style:"width:100%;height:auto;display:block;overflow:visible"},box);
+  const x=i=>padL+(plotW*(labels.length===1?0.5:i/(labels.length-1)));
+  const y=v=>padT+plotH-((v-minV)/(maxV-minV||1))*plotH;
+  // gridlines + y ticks
+  const steps=4;
+  for(let i=0;i<=steps;i++){
+    const v=minV+(maxV-minV)*i/steps;
+    const gy=y(v);
+    el("line",{x1:padL,x2:W-padR,y1:gy,y2:gy,stroke:"var(--grid)","stroke-width":1},svg);
+    const t=el("text",{x:padL-8,y:gy+3,"text-anchor":"end","font-size":10,fill:"var(--ink-muted)"},svg);
+    t.textContent=formatY(v);
+  }
+  // baseline
+  el("line",{x1:padL,x2:W-padR,y1:padT+plotH,y2:padT+plotH,stroke:"var(--baseline)","stroke-width":1},svg);
+  // x labels (sparse)
+  const everyN=Math.ceil(labels.length/7);
+  labels.forEach((lb,i)=>{if(i%everyN!==0&&i!==labels.length-1)return;const t=el("text",{x:x(i),y:H-8,"text-anchor":"middle","font-size":10,fill:"var(--ink-muted)"},svg);t.textContent=lb;});
+  // series
+  series.forEach((s,si)=>{
+    if(area&&series.length===1){
+      let d=`M ${x(0)} ${y(0)} `;s.values.forEach((v,i)=>d+=`L ${x(i)} ${y(v)} `);d+=`L ${x(s.values.length-1)} ${y(0)} Z`;
+      el("path",{d,fill:s.color,opacity:0.1},svg);
+    }
+    let d="";s.values.forEach((v,i)=>{d+=(i===0?"M":"L")+` ${x(i)} ${y(v)} `;});
+    el("path",{d,fill:"none",stroke:s.color,"stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round"},svg);
+    const lastI=s.values.length-1;
+    el("circle",{cx:x(lastI),cy:y(s.values[lastI]),r:4,fill:s.color,stroke:"var(--surface)","stroke-width":2},svg);
+  });
+  // crosshair + hover
+  const tt=makeTooltip(box);
+  const chLine=el("line",{y1:padT,y2:padT+plotH,stroke:"var(--baseline)","stroke-width":1,opacity:0},svg);
+  const hitLayer=el("rect",{x:padL,y:padT,width:plotW,height:plotH,fill:"transparent"},svg);
+  function onMove(evt){
+    const rect=svg.getBoundingClientRect();
+    const px=(evt.clientX-rect.left)*(W/rect.width);
+    let idx=Math.round((px-padL)/plotW*(labels.length-1));
+    idx=Math.max(0,Math.min(labels.length-1,idx));
+    chLine.setAttribute("x1",x(idx));chLine.setAttribute("x2",x(idx));chLine.setAttribute("opacity",1);
+    let rows=series.map(s=>`<div class="tt-row"><span class="tt-key"><span class="tt-swatch" style="background:${s.color}"></span>${s.name}</span><span class="tt-val">${formatY(s.values[idx])}</span></div>`).join("");
+    showTip(tt,evt.clientX-rect.left,evt.clientY-rect.top,`<div class="tt-title">${labels[idx]}</div>${rows}`);
+  }
+  hitLayer.addEventListener("mousemove",onMove);
+  hitLayer.addEventListener("mouseleave",()=>{chLine.setAttribute("opacity",0);hideTip(tt);});
+  if(series.length>=2){
+    const lg=div("legend");
+    series.forEach(s=>{const it=div("legend-item");const sw=div("legend-line");sw.style.background=s.color;it.appendChild(sw);const sp=document.createElement("span");sp.textContent=s.name;it.appendChild(sp);lg.appendChild(it);});
+    box.appendChild(lg);
+  }
+}
+
+/* ---- Vertical bar chart, single series (nominal categories -> one hue) ---- */
+function renderBarChart(host,{labels,values,color="var(--s1)",height=220,formatY=fmtINR,perBarColors=null}){
+  const box=div("chart-box");host.appendChild(box);
+  const W=800,H=height,padL=44,padR=14,padT=14,padB=34;
+  const plotW=W-padL-padR,plotH=H-padT-padB;
+  const maxV=niceMax(Math.max(...values,1));
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,style:"width:100%;height:auto;display:block"},box);
+  const n=values.length;
+  const slot=plotW/n;
+  const barW=Math.min(24,slot*0.55);
+  const y=v=>padT+plotH-(v/maxV)*plotH;
+  const steps=4;
+  for(let i=0;i<=steps;i++){const v=maxV*i/steps;const gy=y(v);el("line",{x1:padL,x2:W-padR,y1:gy,y2:gy,stroke:"var(--grid)","stroke-width":1},svg);const t=el("text",{x:padL-8,y:gy+3,"text-anchor":"end","font-size":10,fill:"var(--ink-muted)"},svg);t.textContent=formatY(v);}
+  el("line",{x1:padL,x2:W-padR,y1:padT+plotH,y2:padT+plotH,stroke:"var(--baseline)","stroke-width":1},svg);
+  const tt=makeTooltip(box);
+  values.forEach((v,i)=>{
+    const cx=padL+slot*i+slot/2;
+    const bh=(v/maxV)*plotH;
+    const rect=el("rect",{x:cx-barW/2,y:y(v),width:barW,height:Math.max(1,bh),rx:4,ry:4,fill:perBarColors?perBarColors[i]:color,style:"cursor:pointer;transition:opacity .1s"},svg);
+    const hit=el("rect",{x:cx-slot/2,y:padT,width:slot,height:plotH,fill:"transparent",style:"cursor:pointer"},svg);
+    hit.addEventListener("mousemove",evt=>{
+      const rc=svg.getBoundingClientRect();
+      rect.style.opacity="0.75";
+      showTip(tt,(evt.clientX-rc.left),(evt.clientY-rc.top),`<div class="tt-title">${labels[i]}</div><div class="tt-row"><span class="tt-key"><span class="tt-swatch" style="background:${perBarColors?perBarColors[i]:color}"></span>Value</span><span class="tt-val">${formatY(v)}</span></div>`);
+    });
+    hit.addEventListener("mouseleave",()=>{rect.style.opacity="1";hideTip(tt);});
+    const lb=el("text",{x:cx,y:H-10,"text-anchor":"middle","font-size":10,fill:"var(--ink-muted)"},svg);
+    lb.textContent=labels[i].length>10?labels[i].slice(0,9)+"…":labels[i];
+  });
+}
+
+/* ---- Donut chart, max 6 segments, hover + legend ---- */
+function renderDonut(host,{data,size=190,centerLabel="",formatVal=fmtNum}){
+  const box=div("chart-box");
+  box.style.display="flex";box.style.gap="20px";box.style.alignItems="center";box.style.flexWrap="wrap";
+  host.appendChild(box);
+  const total=data.reduce((s,d)=>s+d.value,0)||1;
+  const r=size/2-14,cx=size/2,cy=size/2,strokeW=26;
+  const svgWrap=div("");svgWrap.style.position="relative";svgWrap.style.flexShrink="0";
+  const svg=el("svg",{viewBox:`0 0 ${size} ${size}`,width:size,height:size},svgWrap);
+  const tt=makeTooltip(svgWrap);
+  let acc=-90;
+  const gapDeg=2;
+  data.forEach(d=>{
+    const frac=d.value/total;
+    const startDeg=acc+gapDeg/2;
+    const sweepDeg=Math.max(0,frac*360-gapDeg);
+    const endDeg=startDeg+sweepDeg;
+    acc+=frac*360;
+    const large=sweepDeg>180?1:0;
+    const toXY=deg=>{const rad=deg*Math.PI/180;return[cx+r*Math.cos(rad),cy+r*Math.sin(rad)];};
+    const[sx,sy]=toXY(startDeg),[ex,ey]=toXY(endDeg);
+    const path=el("path",{d:`M ${sx} ${sy} A ${r} ${r} 0 ${large} 1 ${ex} ${ey}`,fill:"none",stroke:d.color,"stroke-width":strokeW,"stroke-linecap":"butt",style:"cursor:pointer;transition:stroke-width .1s"},svg);
+    path.addEventListener("mousemove",evt=>{
+      const rc=svgWrap.getBoundingClientRect();
+      path.setAttribute("stroke-width",strokeW+4);
+      showTip(tt,evt.clientX-rc.left,evt.clientY-rc.top,`<div class="tt-title">${d.label}</div><div class="tt-row"><span class="tt-key"><span class="tt-swatch" style="background:${d.color}"></span>Count</span><span class="tt-val">${formatVal(d.value)} (${Math.round(frac*100)}%)</span></div>`);
+    });
+    path.addEventListener("mouseleave",()=>{path.setAttribute("stroke-width",strokeW);hideTip(tt);});
+  });
+  if(centerLabel){
+    const t1=el("text",{x:cx,y:cy-3,"text-anchor":"middle","font-size":20,"font-weight":800,fill:"var(--ink)"},svg);t1.textContent=formatVal(total);
+    const t2=el("text",{x:cx,y:cy+15,"text-anchor":"middle","font-size":10,fill:"var(--ink-muted)"},svg);t2.textContent=centerLabel;
+  }
+  box.appendChild(svgWrap);
+  const lg=div("");lg.style.display="flex";lg.style.flexDirection="column";lg.style.gap="8px";lg.style.flex="1";lg.style.minWidth="140px";
+  data.forEach(d=>{
+    const row=div("");row.style.cssText="display:flex;align-items:center;gap:8px;font-size:12.5px;";
+    const sw=div("legend-swatch");sw.style.background=d.color;row.appendChild(sw);
+    const lab=document.createElement("span");lab.style.cssText="flex:1;color:var(--ink-2);font-weight:600;";lab.textContent=d.label;row.appendChild(lab);
+    const val=document.createElement("span");val.style.cssText="font-weight:800;color:var(--ink);";val.textContent=formatVal(d.value);row.appendChild(val);
+    lg.appendChild(row);
+  });
+  box.appendChild(lg);
+}
+
+/* ---- Funnel chart (ordinal sequential ramp) ---- */
+function renderFunnel(host,{stages,height=180}){
+  const box=div("chart-box");host.appendChild(box);
+  const ramp=["var(--seq-250)","var(--seq-350)","var(--seq-450)","var(--seq-550)","#104281"];
+  const max=Math.max(...stages.map(s=>s.value),1);
+  const W=800,rowH=height/stages.length;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${height}`,style:"width:100%;height:auto;display:block"},box);
+  const tt=makeTooltip(box);
+  stages.forEach((s,i)=>{
+    const frac=s.value/max;
+    const w=Math.max(30,frac*(W-160));
+    const cy=rowH*i+rowH/2;
+    const x0=(W-160-w)/2+70;
+    const color=ramp[Math.min(i,ramp.length-1)];
+    const rect=el("rect",{x:x0,y:cy-16,width:w,height:32,rx:6,fill:color,style:"cursor:pointer"},svg);
+    const lab=el("text",{x:W/2,y:cy+4,"text-anchor":"middle","font-size":12,"font-weight":700,fill:i<2?"var(--ink)":"#fff"},svg);
+    lab.textContent=`${s.label} — ${fmtNum(s.value)}`;
+    rect.addEventListener("mousemove",evt=>{
+      const rc=svg.getBoundingClientRect();
+      const pct=i===0?100:Math.round(s.value/stages[0].value*100);
+      showTip(tt,evt.clientX-rc.left,evt.clientY-rc.top,`<div class="tt-title">${s.label}</div><div class="tt-row"><span class="tt-key">Count</span><span class="tt-val">${fmtNum(s.value)}</span></div><div class="tt-row"><span class="tt-key">Of top stage</span><span class="tt-val">${pct}%</span></div>`);
+    });
+    rect.addEventListener("mouseleave",()=>hideTip(tt));
+  });
+}
+
+/* ---- inline sparkline for stat tiles ---- */
+function sparkSVG(values,color){
+  const W=120,H=28,pad=3;
+  const max=Math.max(...values),min=Math.min(...values,0);
+  const x=i=>pad+(W-2*pad)*(i/(values.length-1));
+  const y=v=>H-pad-((v-min)/(max-min||1))*(H-2*pad);
+  let d="";values.forEach((v,i)=>d+=(i===0?"M":"L")+` ${x(i)} ${y(v)} `);
+  const lastI=values.length-1;
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <circle cx="${x(lastI)}" cy="${y(values[lastI])}" r="3" fill="${color}"/>
+  </svg>`;
+}
+
+/* ---- stat tile builder ---- */
+function statTile(host,{icon,label,value,deltaText,deltaUp,spark,sparkColor="var(--brand)"}){
+  const s=div("stat");
+  s.innerHTML=`<div class="icon">${icon}</div>
+    <div class="label">${label}</div>
+    <div class="value">${value}</div>
+    ${deltaText?`<div class="delta ${deltaUp?'up':'down'}">${deltaUp?'▲':'▼'} ${deltaText}</div>`:""}
+    ${spark?sparkSVG(spark,sparkColor):""}`;
+  host.appendChild(s);
+  return s;
+}
+
+function card(host,title,sub){
+  const c=div("card");
+  if(title)c.innerHTML=`<h3>${title}</h3>${sub?`<div class="card-sub">${sub}</div>`:""}`;
+  host.appendChild(c);
+  return c;
+}
+
+/* =========================================================================
+   DEMO DATA — illustrative only, not real ARM Solar figures
+   ========================================================================= */
+const MONTHS=["Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"];
+
+const DEMO = {
+  company:{
+    revenue:[1850000,2100000,1950000,2400000,2650000,2300000,2800000,1600000],
+    expenses:[1200000,1350000,1300000,1550000,1700000,1500000,1750000,950000],
+    cashPosition:[320000,480000,410000,610000,700000,590000,810000,690000],
+    projectStatus:[
+      {label:"Active",value:18,color:"var(--s1)"},
+      {label:"Completed",value:42,color:"var(--good)"},
+      {label:"On Hold",value:5,color:"var(--warning)"},
+      {label:"Cancelled",value:3,color:"var(--critical)"},
+    ],
+    funnel:[
+      {label:"New Inquiry",value:86},
+      {label:"Site Survey",value:54},
+      {label:"Quotation Sent",value:38},
+      {label:"Negotiation",value:21},
+      {label:"Won",value:14},
+    ],
+    dealers:[
+      {name:"SunPoint Distributors",sub:"14 deals",val:"₹8.4L margin"},
+      {name:"GreenGrid Partners",sub:"11 deals",val:"₹6.9L margin"},
+      {name:"Katni Solar Traders",sub:"9 deals",val:"₹5.2L margin"},
+      {name:"Vindhya Energy Co",sub:"7 deals",val:"₹4.1L margin"},
+      {name:"EcoWatt Associates",sub:"5 deals",val:"₹2.6L margin"},
+    ],
+    alerts:[
+      {level:"crit",icon:"⏰",title:"2 invoices overdue 30+ days",sub:"₹4.2L outstanding — Finance tab"},
+      {level:"warn",icon:"📋",title:"3 projects have overdue compliance items",sub:"Net metering & subsidy docs pending"},
+      {level:"warn",icon:"📦",title:"5 inventory items below minimum stock",sub:"Includes DC cable 4mm² and MC4 connectors"},
+    ],
+  },
+  finance:{
+    gst:{output:480000,input:190000,net:290000},
+    expenseByCategory:{labels:["Material","Labour","Subcontractor","Transport","Equipment","Overhead"],values:[620000,340000,210000,95000,70000,55000]},
+    aging:[
+      {customer:"Rakesh Patidar",amount:118000,days:6,status:"good"},
+      {customer:"Meera Industries",amount:354000,days:18,status:"warn"},
+      {customer:"Vikas Traders",amount:87000,days:34,status:"crit"},
+      {customer:"Anita Sharma",amount:154000,days:41,status:"crit"},
+    ],
+  },
+  sales:{
+    rep:"Rohit Sharma",
+    myLeads:23, myConversions:6, winRate:26, commissionPaid:80000, commissionPending:55000,
+    monthlyWins:[1,0,2,1,2,0,3,1],
+    funnel:[
+      {label:"New",value:23},{label:"Contacted",value:15},{label:"Quoted",value:9},{label:"Negotiation",value:5},{label:"Won",value:6},
+    ],
+    followUps:[
+      {name:"Suresh Yadav",note:"3kW residential — awaiting decision",due:"Overdue 2d",urgent:true},
+      {name:"Poonam Enterprises",note:"10kW commercial — send revised quote",due:"Due today",urgent:true},
+      {name:"Deepak Rathore",note:"5kW residential — site survey follow-up",due:"Due tomorrow",urgent:false},
+      {name:"Kailash Textiles",note:"25kW industrial — negotiation call",due:"Due in 3 days",urgent:false},
+    ],
+  },
+  technician:{
+    name:"Manoj Verma",
+    openTasks:7, ticketsAssigned:4, completedMonth:12, overdue:2,
+    taskStatus:[
+      {label:"Completed",value:12,color:"var(--good)"},
+      {label:"In Progress",value:5,color:"var(--s1)"},
+      {label:"Overdue",value:2,color:"var(--critical)"},
+    ],
+    ticketsTrend:[2,3,1,4,2,3,5,3],
+    ticketWeeks:["W1","W2","W3","W4","W5","W6","W7","W8"],
+    projects:[
+      {name:"Sharma Residence — 5kW",pct:80},
+      {name:"Patidar Farmhouse — 8kW",pct:45},
+      {name:"Om Textiles — 25kW",pct:92},
+      {name:"Yadav Bungalow — 3kW",pct:20},
+    ],
+    todayTasks:[
+      {label:"Panel mounting — Sharma Residence",tag:"high",done:false},
+      {label:"Earthing inspection — Om Textiles",tag:"med",done:false},
+      {label:"Site photos upload — Patidar Farmhouse",tag:"low",done:true},
+      {label:"Ticket #TK-204 — inverter fault check",tag:"high",done:false},
+      {label:"Handover documentation — Yadav Bungalow",tag:"low",done:false},
+    ],
+  },
+  dealer:{
+    name:"SunPoint Distributors",
+    totalProjects:14, marginPaid:610000, marginPending:230000, capacityKw:182,
+    statusBreak:[
+      {label:"Active",value:6,color:"var(--s1)"},
+      {label:"Completed",value:7,color:"var(--good)"},
+      {label:"On Hold",value:1,color:"var(--warning)"},
+    ],
+    marginTrend:[45000,62000,38000,71000,55000,84000,67000,52000],
+    projects:[
+      {name:"Bansal Residence",cap:"6kW",status:"Active",margin:42000},
+      {name:"Om Sweets & Bakery",cap:"12kW",status:"Completed",margin:71000},
+      {name:"Gupta Farmhouse",cap:"8kW",status:"Completed",margin:58000},
+      {name:"Rathi Textiles",cap:"22kW",status:"On Hold",margin:96000},
+      {name:"Chourasia Bungalow",cap:"4kW",status:"Active",margin:29000},
+    ],
+  },
+};
+
+/* =========================================================================
+   ROLE DASHBOARD BUILDERS
+   ========================================================================= */
+const ROLES=[
+  {id:"admin",label:"Admin",icon:"👑",title:"Admin — Company Command Center",
+   caption:"<b>Sees everything:</b> revenue, profit, cash flow, full project portfolio, lead pipeline, dealer performance, inventory value, and compliance alerts across the whole company. This is the owner's unrestricted view."},
+  {id:"finance",label:"Finance",icon:"💰",title:"Finance — Financial Control",
+   caption:"<b>Sees:</b> every money figure across all projects — invoices, collections, expenses, GST, cash position. <b>Does not see:</b> individual sales commission per rep, or non-financial HR data — that's outside Finance's remit."},
+  {id:"sales",label:"Sales", icon:"🎯", title:"Sales — My Pipeline",
+   caption:"<b>Sees:</b> only Rohit's own leads, conversions, and commission earned. <b>Does not see:</b> company-wide revenue or profit, other reps' pipelines or commissions, bank balances, or vendor/inventory pricing."},
+  {id:"technician",label:"Technician",icon:"🔧",title:"Technician — My Work",
+   caption:"<b>Sees:</b> only Manoj's assigned tasks, tickets, and the technical checklists for projects he's on. <b>Does not see:</b> pricing, invoices, profit figures, or sales/dealer data."},
+  {id:"dealer",label:"Dealer",icon:"🤝",title:"Dealer Portal — My Business",
+   caption:"<b>Sees:</b> only SunPoint Distributors' own referred projects, margin earned, and payout status. <b>Does not see:</b> other dealers' numbers or any internal company financials."},
+];
+
+function buildAdmin(root){
+  const head=div("dash-head");
+  head.innerHTML=`<div><h1>👑 Admin — Company Command Center</h1><div class="sub">Full visibility · company-wide, all roles' data</div></div>`;
+  const fr=div("filter-row");fr.innerHTML=`<button class="filter-btn">Last 30 Days</button><button class="filter-btn active">This Year</button><button class="filter-btn">All Time</button>`;
+  head.appendChild(fr);root.appendChild(head);
+
+  const kpis=div("grid g-kpis");root.appendChild(kpis);
+  const d=DEMO.company;
+  const rev=d.revenue.reduce((a,b)=>a+b,0),exp=d.expenses.reduce((a,b)=>a+b,0);
+  statTile(kpis,{icon:"💰",label:"Total Revenue (YTD)",value:fmtINR(rev),deltaText:"12.4% vs last period",deltaUp:true,spark:d.revenue,sparkColor:"var(--s1)"});
+  statTile(kpis,{icon:"📈",label:"Net Profit",value:fmtINR(rev-exp),deltaText:"8.1% vs last period",deltaUp:true,spark:d.revenue.map((v,i)=>v-d.expenses[i]),sparkColor:"var(--good)"});
+  statTile(kpis,{icon:"🏦",label:"Cash Position",value:fmtINR(d.cashPosition.at(-1)),deltaText:"3.9% vs last month",deltaUp:false,spark:d.cashPosition,sparkColor:"var(--s2)"});
+  statTile(kpis,{icon:"🏗️",label:"Active Projects",value:d.projectStatus[0].value,deltaText:"5 new this month",deltaUp:true,spark:[12,14,13,16,15,17,16,18],sparkColor:"var(--brand)"});
+
+  const row1=div("grid g-2");root.appendChild(row1);
+  const c1=card(row1,"Revenue vs Expenses","Monthly, last 8 months");
+  renderLineChart(c1,{labels:MONTHS,series:[{name:"Revenue",color:"var(--s1)",values:d.revenue},{name:"Expenses",color:"var(--s2)",values:d.expenses}]});
+  const c2=card(row1,"Project Portfolio","68 total projects, by status");
+  renderDonut(c2,{data:d.projectStatus,centerLabel:"projects"});
+
+  const row2=div("grid g-2");root.appendChild(row2);
+  const c3=card(row2,"Lead Pipeline Funnel","This year, all sales reps combined");
+  renderFunnel(c3,{stages:d.funnel});
+  const c4=card(row2,"⚠️ Needs Attention");
+  d.alerts.forEach(a=>{
+    const r=div(`alert-row ${a.level}`);
+    r.innerHTML=`<div class="a-icon">${a.icon}</div><div class="a-text"><b>${a.title}</b><span>${a.sub}</span></div>`;
+    c4.appendChild(r);
+  });
+
+  const row3=div("grid g-2");root.appendChild(row3);
+  const c5=card(row3,"Cash Flow","Net cash position over time");
+  renderLineChart(c5,{labels:MONTHS,series:[{name:"Cash position",color:"var(--s3)",values:d.cashPosition}],area:true});
+  const c6=card(row3,"🏆 Top Dealers","By deals closed this year");
+  d.dealers.forEach((dd,i)=>{
+    const r=div("lb-row");
+    r.innerHTML=`<div class="lb-rank">${i+1}</div><div style="flex:1;min-width:0"><div class="lb-name">${dd.name}</div><div class="lb-sub">${dd.sub}</div></div><div class="lb-val">${dd.val}</div>`;
+    c6.appendChild(r);
+  });
+}
+
+function buildFinance(root){
+  const head=div("dash-head");
+  head.innerHTML=`<div><h1>💰 Finance — Financial Control</h1><div class="sub">Company-wide money figures · no HR or commission-per-rep detail</div></div>`;
+  const fr=div("filter-row");fr.innerHTML=`<button class="filter-btn">Last 30 Days</button><button class="filter-btn active">This Year</button><button class="filter-btn">All Time</button>`;
+  head.appendChild(fr);root.appendChild(head);
+
+  const kpis=div("grid g-kpis");root.appendChild(kpis);
+  const d=DEMO.company,f=DEMO.finance;
+  const rev=d.revenue.reduce((a,b)=>a+b,0),exp=d.expenses.reduce((a,b)=>a+b,0);
+  statTile(kpis,{icon:"✅",label:"Collected",value:fmtINR(rev*0.82),deltaText:"6.2% vs last period",deltaUp:true,spark:d.revenue.map(v=>v*0.82),sparkColor:"var(--good)"});
+  statTile(kpis,{icon:"⏳",label:"Outstanding",value:fmtINR(rev*0.18),deltaText:"2 invoices 30+ days overdue",deltaUp:false,spark:[3,4,3,5,4,5,6,4],sparkColor:"var(--warning)"});
+  statTile(kpis,{icon:"🧾",label:"Net GST Payable",value:fmtINR(f.gst.net),deltaText:"Output "+fmtINR(f.gst.output)+" − Input "+fmtINR(f.gst.input),deltaUp:true,spark:[210000,240000,225000,260000,275000,255000,290000,290000],sparkColor:"var(--s7)"});
+  statTile(kpis,{icon:"📈",label:"Net Profit",value:fmtINR(rev-exp),deltaText:"8.1% vs last period",deltaUp:true,spark:d.revenue.map((v,i)=>v-d.expenses[i]),sparkColor:"var(--good)"});
+
+  const row1=div("grid g-2");root.appendChild(row1);
+  const c1=card(row1,"Revenue vs Expenses","Monthly, last 8 months");
+  renderLineChart(c1,{labels:MONTHS,series:[{name:"Revenue",color:"var(--s1)",values:d.revenue},{name:"Expenses",color:"var(--s2)",values:d.expenses}]});
+  const c2=card(row1,"Expenses by Category","This year");
+  renderBarChart(c2,{labels:f.expenseByCategory.labels,values:f.expenseByCategory.values,color:"var(--s1)"});
+
+  const row2=div("grid g-2");root.appendChild(row2);
+  const c3=card(row2,"Cash Flow","Net cash position over time");
+  renderLineChart(c3,{labels:MONTHS,series:[{name:"Cash position",color:"var(--s3)",values:d.cashPosition}],area:true});
+  const c4=card(row2,"⏰ Outstanding Invoice Aging");
+  const tbl=document.createElement("table");tbl.className="simple";
+  tbl.innerHTML=`<tr><th>Customer</th><th>Amount</th><th>Days</th><th>Status</th></tr>`+
+    f.aging.map(a=>`<tr><td>${a.customer}</td><td>${fmtINR(a.amount)}</td><td>${a.days}d</td><td><span class="status-pill ${a.status}"><span class="dot" style="background:currentColor"></span>${a.status==='good'?'On track':a.status==='warn'?'Watch':'Overdue'}</span></td></tr>`).join("");
+  c4.appendChild(tbl);
+}
+
+function buildSales(root){
+  const s=DEMO.sales;
+  const head=div("dash-head");
+  head.innerHTML=`<div><h1>🎯 Sales — My Pipeline</h1><div class="sub">Logged in as ${s.rep} · showing only your own leads and deals</div></div>`;
+  const fr=div("filter-row");fr.innerHTML=`<button class="filter-btn">This Week</button><button class="filter-btn active">This Quarter</button><button class="filter-btn">This Year</button>`;
+  head.appendChild(fr);root.appendChild(head);
+
+  const kpis=div("grid g-kpis");root.appendChild(kpis);
+  statTile(kpis,{icon:"📋",label:"My Active Leads",value:s.myLeads,deltaText:"4 new this week",deltaUp:true,spark:[16,18,19,20,21,22,23,23],sparkColor:"var(--s1)"});
+  statTile(kpis,{icon:"🏆",label:"My Conversions",value:s.myConversions,deltaText:"This quarter",deltaUp:true,spark:s.monthlyWins,sparkColor:"var(--good)"});
+  statTile(kpis,{icon:"🎯",label:"Win Rate",value:s.winRate+"%",deltaText:"2.4pt vs last quarter",deltaUp:true,spark:[21,22,24,23,25,24,26,26],sparkColor:"var(--brand)"});
+  statTile(kpis,{icon:"💵",label:"My Commission",value:fmtINR(s.commissionPaid+s.commissionPending),deltaText:fmtINR(s.commissionPending)+" pending payout",deltaUp:true,spark:[60000,72000,68000,85000,95000,102000,120000,135000],sparkColor:"var(--s2)"});
+
+  const row1=div("grid g-2");root.appendChild(row1);
+  const c1=card(row1,"My Pipeline Funnel","This quarter");
+  renderFunnel(c1,{stages:s.funnel});
+  const c2=card(row1,"⏰ Follow-ups Due");
+  s.followUps.forEach(f=>{
+    const r=div(`alert-row ${f.urgent?'crit':'warn'}`);
+    r.innerHTML=`<div class="a-icon">${f.urgent?'⏰':'📅'}</div><div class="a-text"><b>${f.name}</b><span>${f.note} · ${f.due}</span></div>`;
+    c2.appendChild(r);
+  });
+
+  const row2=div("grid g-2");root.appendChild(row2);
+  const c3=card(row2,"My Wins by Month","Deals I closed, last 8 months");
+  renderBarChart(c3,{labels:MONTHS,values:s.monthlyWins,color:"var(--good)",formatY:v=>Math.round(v)});
+  const c4=card(row2,"My Commission Status");
+  const box=div("");box.style.cssText="display:flex;flex-direction:column;gap:16px;";
+  box.innerHTML=`
+    <div class="meter-row"><div class="meter-top"><span class="mname">Paid</span><span>${fmtINR(s.commissionPaid)}</span></div><div class="meter-track"><div class="meter-fill" style="width:${Math.round(s.commissionPaid/(s.commissionPaid+s.commissionPending)*100)}%;background:var(--good)"></div></div></div>
+    <div class="meter-row"><div class="meter-top"><span class="mname">Pending</span><span>${fmtINR(s.commissionPending)}</span></div><div class="meter-track"><div class="meter-fill" style="width:${Math.round(s.commissionPending/(s.commissionPaid+s.commissionPending)*100)}%;background:var(--warning)"></div></div></div>`;
+  c4.appendChild(box);
+}
+
+function buildTechnician(root){
+  const t=DEMO.technician;
+  const head=div("dash-head");
+  head.innerHTML=`<div><h1>🔧 Technician — My Work</h1><div class="sub">Logged in as ${t.name} · showing only your assigned tasks and projects</div></div>`;
+  const fr=div("filter-row");fr.innerHTML=`<button class="filter-btn active">This Month</button><button class="filter-btn">Last 30 Days</button><button class="filter-btn">All Time</button>`;
+  head.appendChild(fr);root.appendChild(head);
+
+  const kpis=div("grid g-kpis");root.appendChild(kpis);
+  statTile(kpis,{icon:"📝",label:"Open Tasks",value:t.openTasks,deltaText:"2 due today",deltaUp:false,spark:[9,8,9,7,8,7,8,7],sparkColor:"var(--s1)"});
+  statTile(kpis,{icon:"🎫",label:"Tickets Assigned",value:t.ticketsAssigned,deltaText:"1 high priority",deltaUp:false,spark:[3,4,3,5,4,5,4,4],sparkColor:"var(--warning)"});
+  statTile(kpis,{icon:"✅",label:"Completed This Month",value:t.completedMonth,deltaText:"20% vs last month",deltaUp:true,spark:[6,7,8,9,9,10,11,12],sparkColor:"var(--good)"});
+  statTile(kpis,{icon:"⚠️",label:"Overdue",value:t.overdue,deltaText:"Needs action",deltaUp:false,spark:[0,1,1,0,1,2,1,2],sparkColor:"var(--critical)"});
+
+  const row1=div("grid g-2");root.appendChild(row1);
+  const c1=card(row1,"My Assigned Projects","Milestone completion");
+  const mbox=div("");c1.appendChild(mbox);
+  t.projects.forEach(p=>{
+    const r=div("meter-row");
+    r.innerHTML=`<div class="meter-top"><span class="mname">${p.name}</span><span>${p.pct}%</span></div><div class="meter-track"><div class="meter-fill" style="width:${p.pct}%"></div></div>`;
+    mbox.appendChild(r);
+  });
+  const c2=card(row1,"My Task Status","Current breakdown");
+  renderDonut(c2,{data:t.taskStatus,centerLabel:"tasks"});
+
+  const row2=div("grid g-2");root.appendChild(row2);
+  const c3=card(row2,"Tickets Resolved","Weekly, last 8 weeks");
+  renderBarChart(c3,{labels:t.ticketWeeks,values:t.ticketsTrend,color:"var(--s3)",formatY:v=>Math.round(v)});
+  const c4=card(row2,"📋 Today's Tasks");
+  t.todayTasks.forEach(task=>{
+    const r=div("task-row");
+    r.innerHTML=`<div class="chk ${task.done?'done':''}"></div><div style="flex:1">${task.label}</div><span class="tag ${task.tag}">${task.tag}</span>`;
+    c4.appendChild(r);
+  });
+}
+
+function buildDealer(root){
+  const dl=DEMO.dealer;
+  const head=div("dash-head");
+  head.innerHTML=`<div><h1>🤝 Dealer Portal — My Business</h1><div class="sub">Logged in as ${dl.name} · showing only your own referred projects</div></div>`;
+  const fr=div("filter-row");fr.innerHTML=`<button class="filter-btn">Last 30 Days</button><button class="filter-btn active">This Year</button><button class="filter-btn">All Time</button>`;
+  head.appendChild(fr);root.appendChild(head);
+
+  const kpis=div("grid g-kpis");root.appendChild(kpis);
+  statTile(kpis,{icon:"🏗️",label:"My Referred Projects",value:dl.totalProjects,deltaText:"2 new this quarter",deltaUp:true,spark:[8,9,10,11,12,13,13,14],sparkColor:"var(--s1)"});
+  statTile(kpis,{icon:"💵",label:"Margin Earned (Paid)",value:fmtINR(dl.marginPaid),deltaText:"9.8% vs last period",deltaUp:true,spark:DEMO.dealer.marginTrend,sparkColor:"var(--good)"});
+  statTile(kpis,{icon:"⏳",label:"Margin Pending",value:fmtINR(dl.marginPending),deltaText:"Awaiting payout",deltaUp:false,spark:[18000,20000,19000,22000,23000,21000,24000,23000],sparkColor:"var(--warning)"});
+  statTile(kpis,{icon:"⚡",label:"Capacity Sold",value:dl.capacityKw+" kW",deltaText:"14 kW this quarter",deltaUp:true,spark:[120,132,140,150,158,166,174,182],sparkColor:"var(--brand)"});
+
+  const row1=div("grid g-2");root.appendChild(row1);
+  const c1=card(row1,"Margin Earned by Month","Last 8 months");
+  renderBarChart(c1,{labels:MONTHS,values:dl.marginTrend,color:"var(--s1)"});
+  const c2=card(row1,"My Projects by Status");
+  renderDonut(c2,{data:dl.statusBreak,centerLabel:"projects"});
+
+  const row2=div("grid");root.appendChild(row2);
+  const c3=card(row2,"📋 My Projects");
+  const tbl=document.createElement("table");tbl.className="simple";
+  tbl.innerHTML=`<tr><th>Project</th><th>Capacity</th><th>Status</th><th>My Margin</th></tr>`+
+    dl.projects.map(p=>{
+      const cls=p.status==="Completed"?"good":p.status==="On Hold"?"warn":"neutral";
+      return `<tr><td>${p.name}</td><td>${p.cap}</td><td><span class="status-pill ${cls}"><span class="dot" style="background:currentColor"></span>${p.status}</span></td><td>${fmtINR(p.margin)}</td></tr>`;
+    }).join("");
+  c3.appendChild(tbl);
+}
+
+const BUILDERS={admin:buildAdmin,finance:buildFinance,sales:buildSales,technician:buildTechnician,dealer:buildDealer};
+
+/* =========================================================================
+   APP INIT — role switcher
+   ========================================================================= */
+const switchHost=document.getElementById("roleSwitch");
+const dashHost=document.getElementById("dashHost");
+const captionHost=document.getElementById("roleCaption");
+const dashCache={};
+
+ROLES.forEach(r=>{
+  const btn=document.createElement("button");
+  btn.className="role-btn";btn.dataset.role=r.id;
+  btn.innerHTML=`${r.icon} ${r.label}`;
+  btn.addEventListener("click",()=>showRole(r.id));
+  switchHost.appendChild(btn);
+});
+
+function showRole(id){
+  ROLES.forEach(r=>{
+    document.querySelector(`.role-btn[data-role="${r.id}"]`).classList.toggle("active",r.id===id);
+  });
+  const roleInfo=ROLES.find(r=>r.id===id);
+  captionHost.innerHTML=roleInfo.caption;
+  Object.keys(dashCache).forEach(k=>dashCache[k].classList.remove("active"));
+  if(!dashCache[id]){
+    const d=div("dash");
+    BUILDERS[id](d);
+    dashHost.appendChild(d);
+    dashCache[id]=d;
+  }
+  dashCache[id].classList.add("active");
+}
+showRole("admin");
+</script>
+</body>
+</html>

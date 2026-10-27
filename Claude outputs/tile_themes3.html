@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghost Watermark — Shiny Variants</title>
+<style>
+:root{--page:#ecfeff;--card:#fff;--border:#e2e8f0;--ink:#1e293b;--ink2:#64748b;--muted:#94a3b8;--brand:#0e7490;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+.wrap{max-width:1160px;margin:0 auto;padding:26px 16px 70px;}
+h1{font-size:23px;font-weight:800;margin:0 0 4px;}
+.sub{color:var(--ink2);font-size:13.5px;margin-bottom:24px;line-height:1.6;}
+.sec{margin-bottom:34px;}
+.sh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:3px;}
+.tag{background:var(--brand);color:#fff;font-size:10.5px;font-weight:800;border-radius:6px;padding:3px 8px;letter-spacing:.4px;}
+.tag.base{background:var(--muted);}
+.tag.pick{background:#0ca30c;}
+.st{font-size:16.5px;font-weight:800;}
+.sp{color:var(--ink2);font-size:12.5px;margin:0 0 12px;line-height:1.6;}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:13px;}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:13px;margin-top:11px;}
+.cap{font-size:11px;color:var(--muted);margin-top:9px;font-weight:600;}
+
+/* shared ghost-watermark tile shell */
+.t{border-radius:18px;padding:17px 19px;position:relative;overflow:hidden;border:1px solid;}
+.t .gh{position:absolute;right:-12px;bottom:-24px;font-size:84px;line-height:1;
+  transform:rotate(-12deg);pointer-events:none;user-select:none;}
+.t .in{position:relative;z-index:3;}
+.t .l{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;opacity:.74;margin-bottom:10px;}
+.t .v{font-size:28px;font-weight:800;line-height:1;letter-spacing:-.6px;}
+.t .sb{font-size:10.5px;margin-top:7px;opacity:.72;font-weight:600;}
+.gloss{position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:linear-gradient(104deg,transparent 18%,rgba(255,255,255,.62) 36%,rgba(255,255,255,.12) 50%,transparent 60%);}
+.glow{position:absolute;inset:0;pointer-events:none;z-index:1;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ghost watermark — with gradient and shine</h1>
+  <p class="sub">Your pick is at the top as it was. The six below keep the same shape and the same large watermark, and add gradient and light to it in different amounts. Note which ones drain the colour out of the watermark — that is what stops the icons reading as grey clutter.</p>
+  <div id="root"></div>
+</div>
+<script>
+const T=[["💰","₹0","Total Revenue Collected","#0e7490"],
+         ["📈","-₹1.45 L","Net Profit","#ef4444"],
+         ["🏦","₹0","Cash Position","#8b5cf6"],
+         ["🏗️","1","Active Projects","#f59e0b"]];
+const S=[["🔴","2","Overdue Invoices","#ef4444","₹3.76 L outstanding"],
+         ["📄","₹1.39 L","Net GST Payable","#8b5cf6","Output ₹4.80 L − Input ₹1.90 L"]];
+const dk={"#0e7490":"#0a4e5f","#ef4444":"#b91c1c","#8b5cf6":"#6d28d9","#f59e0b":"#c2740a"};
+const lt={"#0e7490":"#22a5c0","#ef4444":"#fb7676","#8b5cf6":"#a98af8","#f59e0b":"#fbbf24"};
+const body=(v,l,b)=>`<div class="in"><div class="l">${l}</div><div class="v">${v}</div>${b?`<div class="sb">${b}</div>`:''}</div>`;
+
+const R={
+ base:(i,v,l,c,b)=>`<div class="t" style="background:${c}12;border-color:${c}2b;color:${c}">
+   <div class="gh" style="opacity:.10">${i}</div>${body(v,l,b)}</div>`,
+
+ // 1 — gradient tint, watermark still full colour
+ v1:(i,v,l,c,b)=>`<div class="t" style="background:linear-gradient(140deg,${c}26,${c}08 60%,#ffffff);
+   border-color:${c}2e;color:${c}"><div class="gh" style="opacity:.13">${i}</div>${body(v,l,b)}</div>`,
+
+ // 2 — gradient + gloss sweep, watermark drained to grey
+ v2:(i,v,l,c,b)=>`<div class="t" style="background:linear-gradient(140deg,${c}2b,${c}09 62%,#ffffff);
+   border-color:${c}30;color:${c};box-shadow:0 4px 14px ${c}1f">
+   <div class="gh" style="opacity:.16;filter:grayscale(1)">${i}</div>
+   <div class="gloss"></div>${body(v,l,b)}</div>`,
+
+ // 3 — radial corner glow behind a drained watermark
+ v3:(i,v,l,c,b)=>`<div class="t" style="background:${c}0d;border-color:${c}2b;color:${c}">
+   <div class="glow" style="background:radial-gradient(circle at 86% 88%,${c}55,transparent 58%)"></div>
+   <div class="gh" style="opacity:.2;filter:grayscale(1)">${i}</div>${body(v,l,b)}</div>`,
+
+ // 4 — embossed: watermark blended into the gradient
+ v4:(i,v,l,c,b)=>`<div class="t" style="background:linear-gradient(145deg,${c}2e,${c}0d 55%,${c}1a);
+   border-color:${c}33;color:${c}">
+   <div class="gh" style="opacity:.85;filter:grayscale(1);mix-blend-mode:soft-light">${i}</div>
+   ${body(v,l,b)}</div>`,
+
+ // 5 — full saturated gradient, luminous watermark, white figures
+ v5:(i,v,l,c,b)=>`<div class="t" style="background:linear-gradient(140deg,${lt[c]},${dk[c]});
+   border-color:${dk[c]};color:#fff;box-shadow:0 5px 16px ${c}3d">
+   <div class="gh" style="opacity:.18;filter:grayscale(1) brightness(3)">${i}</div>
+   <div class="gloss" style="opacity:.5"></div>
+   <div class="in"><div class="l" style="opacity:.8">${l}</div><div class="v">${v}</div>
+   ${b?`<div class="sb" style="opacity:.75">${b}</div>`:''}</div></div>`,
+
+ // 6 — the works: gradient + gloss + glow + coloured drop shadow
+ v6:(i,v,l,c,b)=>`<div class="t" style="background:linear-gradient(135deg,${c}33,${c}0a 55%,#ffffff);
+   border-color:${c}38;color:${c};box-shadow:0 6px 20px ${c}2e, inset 0 1px 0 rgba(255,255,255,.7)">
+   <div class="glow" style="background:radial-gradient(circle at 90% 90%,${c}4d,transparent 55%)"></div>
+   <div class="gh" style="opacity:.9;filter:grayscale(1);mix-blend-mode:soft-light">${i}</div>
+   <div class="gloss"></div>${body(v,l,b)}</div>`
+};
+
+const SECS=[
+ {tag:'YOUR PICK',cls:'base',t:'Ghost watermark as you saw it',k:'base',
+  p:'Flat tint, full-colour icon at 10% — the version you liked. Everything below starts from this.'},
+ {tag:'SHINE 1',cls:'',t:'Gradient tint, watermark unchanged',k:'v1',
+  p:'Only the background changes: the tint now runs diagonally and fades into white at the bottom right. The watermark stays in full colour exactly as you saw it.'},
+ {tag:'SHINE 2',cls:'',t:'Gradient with a gloss sweep',k:'v2',
+  p:'Adds a soft diagonal band of light across the tile, like a reflection on glass, plus a faint coloured shadow. The watermark is drained to grey so the icons stop competing with the number.'},
+ {tag:'SHINE 3',cls:'',t:'Corner glow behind the watermark',k:'v3',
+  p:'Instead of a sweep, the corner the icon sits in is lit up with a radial glow, so the watermark appears to be emerging from the light rather than printed on top of it.'},
+ {tag:'SHINE 4',cls:'',t:'Embossed into the gradient',k:'v4',
+  p:'The watermark is blended into the background rather than layered over it, so it reads as pressed into the surface. The most subtle of the six and the most expensive looking.'},
+ {tag:'SHINE 5',cls:'',t:'Full colour gradient, white figures',k:'v5',
+  p:'The tile becomes solid colour — a light-to-dark gradient with white text, a gloss band and a luminous watermark. Much bolder; four of these in a row is a strong statement.'},
+ {tag:'SHINE 6',cls:'',t:'Everything at once',k:'v6',
+  p:'Gradient, corner glow, gloss sweep, embossed watermark, coloured drop shadow and a bright inner top edge. The shiniest it gets before it starts to look like a toy.'}
+];
+document.getElementById('root').innerHTML=SECS.map(s=>`<div class="sec">
+  <div class="sh"><span class="tag ${s.cls}">${s.tag}</span><span class="st">${s.t}</span></div>
+  <p class="sp">${s.p}</p>
+  <div class="row">${T.map(t=>R[s.k](...t)).join('')}</div>
+  <div class="row2">${S.map(t=>R[s.k](...t)).join('')}</div>
+  <div class="cap">↑ four Admin tiles · ↓ same style with a supporting line</div></div>`).join('');
+</script>
+</body>
+</html>

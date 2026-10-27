@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SolarEPC — Theme Options</title>
+<style>
+  :root{color-scheme:light;}
+  *{box-sizing:border-box;}
+  body{margin:0;padding:32px 20px;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#1e293b;}
+  .wrap{max-width:1180px;margin:0 auto;}
+  h1{font-size:24px;font-weight:800;margin:0 0 6px;}
+  .sub{color:#64748b;font-size:14px;margin:0 0 28px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;}
+  .card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);border:1px solid #e2e8f0;}
+  .card-head{padding:16px 18px 10px;}
+  .card-head .name{font-size:15px;font-weight:800;}
+  .card-head .desc{font-size:12px;color:#64748b;margin-top:2px;line-height:1.5;}
+  .mock{display:flex;height:190px;border-top:1px solid #eef2f7;}
+  .mock-side{width:70px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:16px;}
+  .mock-side .dot{width:26px;height:26px;border-radius:8px;}
+  .mock-side .dot.on{width:30px;height:30px;}
+  .mock-main{flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+  .mock-title{font-size:12px;font-weight:800;}
+  .tiles{display:flex;gap:8px;}
+  .tile{flex:1;border-radius:9px;padding:8px 9px;border-left:3px solid;}
+  .tile .v{font-size:13px;font-weight:900;}
+  .tile .l{font-size:8px;color:#94a3b8;font-weight:700;text-transform:uppercase;margin-top:2px;}
+  .btn{align-self:flex-start;padding:7px 14px;border-radius:8px;font-size:11px;font-weight:700;color:#fff;margin-top:2px;}
+  .barline{height:6px;border-radius:4px;background:#eef2f7;overflow:hidden;margin-top:4px;}
+  .barline i{display:block;height:100%;border-radius:4px;}
+  .swatches{display:flex;gap:6px;padding:12px 16px 16px;}
+  .sw{flex:1;height:30px;border-radius:6px;position:relative;}
+  .sw span{position:absolute;bottom:-16px;left:0;font-size:8.5px;color:#94a3b8;font-weight:700;white-space:nowrap;}
+  .foot{margin-top:34px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px 20px;font-size:13px;line-height:1.7;color:#334155;}
+  .foot b{color:#1e293b;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SolarEPC — Theme Options</h1>
+  <p class="sub">Six directions, previewed against the same layout (sidebar · stat tiles · button · progress bar) so they're easy to compare. Current app shown first for reference.</p>
+
+  <div class="grid">
+
+    <!-- 1. CURRENT -->
+    <div class="card">
+      <div class="card-head"><div class="name">① Current — Indigo</div><div class="desc">What the app looks like today. Included so the others have something to compare against.</div></div>
+      <div class="mock" style="background:#f8fafc">
+        <div class="mock-side" style="background:#1e1b4b">
+          <div class="dot on" style="background:#fbbf24"></div>
+          <div class="dot" style="background:#3730a3"></div>
+          <div class="dot" style="background:#3730a3"></div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-title" style="color:#1e293b">💰 Finance</div>
+          <div class="tiles">
+            <div class="tile" style="background:#fff;border-color:#6366f1"><div class="v" style="color:#6366f1">₹3,40,000</div><div class="l">Value</div></div>
+            <div class="tile" style="background:#fff;border-color:#16a34a"><div class="v" style="color:#16a34a">₹2,00,000</div><div class="l">Collected</div></div>
+            <div class="tile" style="background:#fff;border-color:#ef4444"><div class="v" style="color:#ef4444">₹4,43,000</div><div class="l">Spent</div></div>
+          </div>
+          <div class="barline"><i style="width:59%;background:#6366f1"></i></div>
+          <div class="btn" style="background:#6366f1">+ Log Expense</div>
+        </div>
+      </div>
+      <div class="swatches">
+        <div class="sw" style="background:#6366f1"><span>Primary</span></div>
+        <div class="sw" style="background:#1e1b4b"><span>Sidebar</span></div>
+        <div class="sw" style="background:#16a34a"><span>Success</span></div>
+        <div class="sw" style="background:#ef4444"><span>Danger</span></div>
+      </div>
+    </div>
+
+    <!-- 2. SOLAR GOLD -->
+    <div class="card">
+      <div class="card-head"><div class="name">② Solar Gold</div><div class="desc">Warm amber/sun tones as the primary color instead of indigo — reads as "solar" at a glance. Navy sidebar kept for contrast.</div></div>
+      <div class="mock" style="background:#fffaf0">
+        <div class="mock-side" style="background:#1c1917">
+          <div class="dot on" style="background:#f59e0b"></div>
+          <div class="dot" style="background:#44403c"></div>
+          <div class="dot" style="background:#44403c"></div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-title" style="color:#1c1917">💰 Finance</div>
+          <div class="tiles">
+            <div class="tile" style="background:#fff;border-color:#d97706"><div class="v" style="color:#b45309">₹3,40,000</div><div class="l">Value</div></div>
+            <div class="tile" style="background:#fff;border-color:#16a34a"><div class="v" style="color:#16a34a">₹2,00,000</div><div class="l">Collected</div></div>
+            <div class="tile" style="background:#fff;border-color:#ef4444"><div class="v" style="color:#ef4444">₹4,43,000</div><div class="l">Spent</div></div>
+          </div>
+          <div class="barline"><i style="width:59%;background:#f59e0b"></i></div>
+          <div class="btn" style="background:#f59e0b;color:#1c1917">+ Log Expense</div>
+        </div>
+      </div>
+      <div class="swatches">
+        <div class="sw" style="background:#f59e0b"><span>Primary</span></div>
+        <div class="sw" style="background:#1c1917"><span>Sidebar</span></div>
+        <div class="sw" style="background:#16a34a"><span>Success</span></div>
+        <div class="sw" style="background:#ef4444"><span>Danger</span></div>
+      </div>
+    </div>
+
+    <!-- 3. FOREST GREEN -->
+    <div class="card">
+      <div class="card-head"><div class="name">③ Forest Green</div><div class="desc">Deep green as the primary brand color — reads as "renewable / clean energy". Success color shifts to teal so profit tiles stay distinct.</div></div>
+      <div class="mock" style="background:#f6faf7">
+        <div class="mock-side" style="background:#0f2e1d">
+          <div class="dot on" style="background:#4ade80"></div>
+          <div class="dot" style="background:#14532d"></div>
+          <div class="dot" style="background:#14532d"></div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-title" style="color:#0f2e1d">💰 Finance</div>
+          <div class="tiles">
+            <div class="tile" style="background:#fff;border-color:#15803d"><div class="v" style="color:#15803d">₹3,40,000</div><div class="l">Value</div></div>
+            <div class="tile" style="background:#fff;border-color:#0d9488"><div class="v" style="color:#0d9488">₹2,00,000</div><div class="l">Collected</div></div>
+            <div class="tile" style="background:#fff;border-color:#ef4444"><div class="v" style="color:#ef4444">₹4,43,000</div><div class="l">Spent</div></div>
+          </div>
+          <div class="barline"><i style="width:59%;background:#15803d"></i></div>
+          <div class="btn" style="background:#15803d">+ Log Expense</div>
+        </div>
+      </div>
+      <div class="swatches">
+        <div class="sw" style="background:#15803d"><span>Primary</span></div>
+        <div class="sw" style="background:#0f2e1d"><span>Sidebar</span></div>
+        <div class="sw" style="background:#0d9488"><span>Success</span></div>
+        <div class="sw" style="background:#ef4444"><span>Danger</span></div>
+      </div>
+    </div>
+
+    <!-- 4. OCEAN TEAL -->
+    <div class="card">
+      <div class="card-head"><div class="name">④ Ocean Teal</div><div class="desc">Cooler, modern SaaS feel — teal/cyan primary on a near-black sidebar. Neutral, doesn't lean "solar" specifically, just clean and current.</div></div>
+      <div class="mock" style="background:#f4fbfc">
+        <div class="mock-side" style="background:#0c1e24">
+          <div class="dot on" style="background:#22d3ee"></div>
+          <div class="dot" style="background:#164e5c"></div>
+          <div class="dot" style="background:#164e5c"></div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-title" style="color:#0c1e24">💰 Finance</div>
+          <div class="tiles">
+            <div class="tile" style="background:#fff;border-color:#0e7490"><div class="v" style="color:#0e7490">₹3,40,000</div><div class="l">Value</div></div>
+            <div class="tile" style="background:#fff;border-color:#16a34a"><div class="v" style="color:#16a34a">₹2,00,000</div><div class="l">Collected</div></div>
+            <div class="tile" style="background:#fff;border-color:#ef4444"><div class="v" style="color:#ef4444">₹4,43,000</div><div class="l">Spent</div></div>
+          </div>
+          <div class="barline"><i style="width:59%;background:#0e7490"></i></div>
+          <div class="btn" style="background:#0e7490">+ Log Expense</div>
+        </div>
+      </div>
+      <div class="swatches">
+        <div class="sw" style="background:#0e7490"><span>Primary</span></div>
+        <div class="sw" style="background:#0c1e24"><span>Sidebar</span></div>
+        <div class="sw" style="background:#16a34a"><span>Success</span></div>
+        <div class="sw" style="background:#ef4444"><span>Danger</span></div>
+      </div>
+    </div>
+
+    <!-- 5. SLATE PROFESSIONAL -->
+    <div class="card">
+      <div class="card-head"><div class="name">⑤ Slate Professional</div><div class="desc">Muted charcoal/slate as primary, almost no saturated color except status tiles. Serious, minimal, "accounting software" feel.</div></div>
+      <div class="mock" style="background:#f8fafc">
+        <div class="mock-side" style="background:#1e293b">
+          <div class="dot on" style="background:#94a3b8"></div>
+          <div class="dot" style="background:#334155"></div>
+          <div class="dot" style="background:#334155"></div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-title" style="color:#1e293b">💰 Finance</div>
+          <div class="tiles">
+            <div class="tile" style="background:#fff;border-color:#475569"><div class="v" style="color:#334155">₹3,40,000</div><div class="l">Value</div></div>
+            <div class="tile" style="background:#fff;border-color:#16a34a"><div class="v" style="color:#16a34a">₹2,00,000</div><div class="l">Collected</div></div>
+            <div class="tile" style="background:#fff;border-color:#ef4444"><div class="v" style="color:#ef4444">₹4,43,000</div><div class="l">Spent</div></div>
+          </div>
+          <div class="barline"><i style="width:59%;background:#475569"></i></div>
+          <div class="btn" style="background:#334155">+ Log Expense</div>
+        </div>
+      </div>
+      <div class="swatches">
+        <div class="sw" style="background:#334155"><span>Primary</span></div>
+        <div class="sw" style="background:#1e293b"><span>Sidebar</span></div>
+        <div class="sw" style="background:#16a34a"><span>Success</span></div>
+        <div class="sw" style="background:#ef4444"><span>Danger</span></div>
+      </div>
+    </div>
+
+    <!-- 6. MIDNIGHT DARK -->
+    <div class="card" style="background:#0f172a;border-color:#1e293b;">
+      <div class="card-head"><div class="name" style="color:#f1f5f9">⑥ Midnight Dark Mode</div><div class="desc" style="color:#94a3b8">A genuine dark theme, not just a dark sidebar — dark cards and background throughout, indigo accent kept from the current theme. Easier on the eyes at night.</div></div>
+      <div class="mock" style="background:#0b1220">
+        <div class="mock-side" style="background:#000">
+          <div class="dot on" style="background:#818cf8"></div>
+          <div class="dot" style="background:#1e293b"></div>
+          <div class="dot" style="background:#1e293b"></div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-title" style="color:#e2e8f0">💰 Finance</div>
+          <div class="tiles">
+            <div class="tile" style="background:#1e293b;border-color:#818cf8"><div class="v" style="color:#a5b4fc">₹3,40,000</div><div class="l">Value</div></div>
+            <div class="tile" style="background:#1e293b;border-color:#4ade80"><div class="v" style="color:#4ade80">₹2,00,000</div><div class="l">Collected</div></div>
+            <div class="tile" style="background:#1e293b;border-color:#f87171"><div class="v" style="color:#f87171">₹4,43,000</div><div class="l">Spent</div></div>
+          </div>
+          <div class="barline" style="background:#1e293b"><i style="width:59%;background:#818cf8"></i></div>
+          <div class="btn" style="background:#6366f1">+ Log Expense</div>
+        </div>
+      </div>
+      <div class="swatches">
+        <div class="sw" style="background:#6366f1"><span style="color:#64748b">Primary</span></div>
+        <div class="sw" style="background:#000"><span style="color:#64748b">Sidebar</span></div>
+        <div class="sw" style="background:#4ade80"><span style="color:#64748b">Success</span></div>
+        <div class="sw" style="background:#f87171"><span style="color:#64748b">Danger</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <b>How to pick:</b> tell me a number (or a couple to combine — e.g. "sidebar from ⑥ but Solar Gold's primary color"), or describe your own direction and I'll mock that up instead. Status colors (green = good, red = danger, amber = warning) stay the same in every option — only the primary/brand color, backgrounds and sidebar change, so nothing about how to read the app changes.
+  </div>
+</div>
+</body>
+</html>
